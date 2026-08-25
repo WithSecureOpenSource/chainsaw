@@ -252,3 +252,14 @@ macro_rules! cs_eredln {
         }
     };
 }
+
+#[macro_export]
+macro_rules! flush {
+    ($($arg:tt)*) => {{
+        use std::io::Write;
+        match &mut $crate::writer().output.as_mut() {
+            Some(f) => f.flush(),
+            None => Ok(()),
+        }
+    }};
+}
