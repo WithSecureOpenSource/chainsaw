@@ -41,16 +41,16 @@ filter:
     FullPath:
       - 'i*nxc.exe*'
 
-   netexec1:
+  netexec1:
     FullPath:
       - 'i*.nxc\workspaces*'
       - 'i*.nxc\workspaces\default*'
 
-    netexec2:
+  netexec2:
     FullPath:
       - 'inxc.conf*'
 
-    netexec3:
+  netexec3:
     FullPath:
       - 'iftp.db*'
       - 'ildap.db*'
