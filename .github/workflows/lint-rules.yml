@@ -1,0 +1,40 @@
+---
+name: lint-rules
+
+on:
+  pull_request:
+    paths:
+      - 'rules/**'
+      - 'src/**'
+      - 'Cargo.toml'
+      - 'Cargo.lock'
+      - '.github/workflows/lint-rules.yml'
+  push:
+    branches: [master]
+    paths:
+      - 'rules/**'
+      - 'src/**'
+
+jobs:
+  lint-rules:
+    name: Validate detection rules
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          submodules: recursive
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo build
+        uses: Swatinem/rust-cache@v2
+
+      - name: Build chainsaw
+        run: cargo build --release
+
+      # Lints against the binary built from this PR, so a rule relying on a
+      # schema change in the same PR is validated against that change.
+      - name: Lint detection rules
+        run: ./target/release/chainsaw --no-banner lint --kind chainsaw rules/
