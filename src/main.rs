@@ -927,6 +927,9 @@ fn run() -> Result<()> {
                 count,
                 count + failed
             );
+            if failed > 0 {
+                anyhow::bail!("{} detection rule(s) failed to validate", failed);
+            }
         }
         Command::Search {
             path,
