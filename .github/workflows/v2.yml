@@ -14,12 +14,9 @@ jobs:
         with:
           submodules: recursive
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          target: x86_64-unknown-linux-gnu
+          targets: x86_64-unknown-linux-gnu
       - name: Create artifacts directory
         run: mkdir chainsaw
       - name: Build
@@ -54,12 +51,9 @@ jobs:
       - name: Install Target
         run: sudo apt install gcc-aarch64-linux-gnu
       - name: Install Rust
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          profile: minimal
-          override: true
-          target: aarch64-unknown-linux-gnu
+          targets: aarch64-unknown-linux-gnu
       - name: Create artifacts directory
         run: mkdir chainsaw
       - name: Build
@@ -93,11 +87,7 @@ jobs:
         with:
           submodules: recursive
       - name: Install latest rust toolchain
-        uses: actions-rs/toolchain@v1
-        with:
-          toolchain: stable
-          default: true
-          override: true
+        uses: dtolnay/rust-toolchain@stable
       - name: Build
         run: cargo build --all --release
       - name: Upload binary artifact
@@ -130,12 +120,9 @@ jobs:
         with:
           submodules: recursive
       - name: Install latest rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          target: x86_64-apple-darwin
-          default: true
-          override: true
+          targets: x86_64-apple-darwin
       - name: Create artifacts directory
         run: mkdir chainsaw
       - name: Build for mac
@@ -166,12 +153,9 @@ jobs:
         with:
           submodules: recursive
       - name: Install latest rust toolchain
-        uses: actions-rs/toolchain@v1
+        uses: dtolnay/rust-toolchain@stable
         with:
-          toolchain: stable
-          target: aarch64-apple-darwin
-          default: true
-          override: true
+          targets: aarch64-apple-darwin
       - name: Create artifacts directory
         run: mkdir chainsaw
       - name: Build for mac
