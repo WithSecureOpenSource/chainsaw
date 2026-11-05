@@ -247,7 +247,8 @@ pub fn load(
                     s.tau.detection.identifiers.clear();
                     s.tau.detection.expression = optimiser::shake(s.tau.detection.expression);
                     s.tau.detection.expression = optimiser::rewrite(s.tau.detection.expression);
-                    s.tau.detection.expression = optimiser::matrix(s.tau.detection.expression);
+                    // FIXME: Off until matrix optimisation is fixed upstream.
+                    //s.tau.detection.expression = optimiser::matrix(s.tau.detection.expression);
                     Rule::Sigma(s)
                 })
                 .collect()
