@@ -21,76 +21,76 @@ fields:
     to: Event.System.Computer
   - name: HostName
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: HostName
-    from: Event.EventData.Data[2].HostName
+    from: Event.EventData.Data.#text[2].HostName
   - name: HostVersion
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: HostVersion
-    from: Event.EventData.Data[2].HostVersion
+    from: Event.EventData.Data.#text[2].HostVersion
   - name: HostApplication
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: HostApplication
-    from: Event.EventData.Data[2].HostApplication
+    from: Event.EventData.Data.#text[2].HostApplication
   - name: PipelineId
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: PipelineId
-    from: Event.EventData.Data[2].PipelineId
+    from: Event.EventData.Data.#text[2].PipelineId
   - name: CommandName
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: CommandName
-    from: Event.EventData.Data[2].CommandName
+    from: Event.EventData.Data.#text[2].CommandName
   - name: CommandType
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: CommandType
-    from: Event.EventData.Data[2].CommandType
+    from: Event.EventData.Data.#text[2].CommandType
   - name: ScriptName
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: ScriptName
-    from: Event.EventData.Data[2].ScriptName
+    from: Event.EventData.Data.#text[2].ScriptName
   - name: CommandPath
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: CommandPath
-    from: Event.EventData.Data[2].CommandPath
+    from: Event.EventData.Data.#text[2].CommandPath
   - name: CommandLine
     container:
-     field: Event.EventData.Data[2]
+     field: Event.EventData.Data.#text[2]
      format: kv
      delimiter: "\r\n\t"
      separator: '='
     to: CommandLine
-    from: Event.EventData.Data[2].CommandLine
+    from: Event.EventData.Data.#text[2].CommandLine
 filter:
   condition: powershell
 
