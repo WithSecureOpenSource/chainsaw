@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::path::Path;
 
-use evtx::{EvtxParser, ParserSettings, SerializedEvtxRecord, err::EvtxError};
+use evtx::{err::EvtxError, EvtxParser, ParserSettings, SerializedEvtxRecord};
 use regex::RegexSet;
 use serde_json::Value as Json;
 use tau_engine::{Document, Value as Tau};
@@ -25,7 +25,24 @@ impl Parser {
     pub fn parse(
         &mut self,
     ) -> impl Iterator<Item = Result<SerializedEvtxRecord<serde_json::Value>, EvtxError>> + '_ {
-        self.inner.records_json_value()
+        // HACK: Normalise #text to always be an array!
+        //self.inner.records_json_value()
+        self.inner.records_json_value().map(|mut result| {
+            if let Ok(value) = result.as_mut() {
+                if let Some(event) = value.data.get_mut("Event") {
+                    if let Some(event_data) = event.get_mut("EventData") {
+                        if let Some(data) = event_data.get_mut("Data") {
+                            if let Some(text) = data.get_mut("#text") {
+                                if text.is_string() {
+                                    *text = Json::Array(vec![text.to_owned()]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            result
+        })
     }
 }
 
