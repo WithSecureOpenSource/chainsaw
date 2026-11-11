@@ -20,11 +20,11 @@ fields:
   - name: Computer
     to: Event.System.Computer
   - name: User
-    to: Event.EventData.Data[19]
+    to: Event.EventData.Data.#text[19]
   - name: Threat Name
-    to: Event.EventData.Data[7]
+    to: Event.EventData.Data.#text[7]
   - name: Threat Path
-    to: Event.EventData.Data
+    to: Event.EventData.Data.#text
 
 
 filter:
