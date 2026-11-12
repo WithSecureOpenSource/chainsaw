@@ -20,14 +20,14 @@ fields:
   - name: Computer
     to: Event.System.Computer
   - name: Threat Type
-    to: Event.EventData.Data[0]
+    to: Event.EventData.Data.#text[0]
   - name: Threat Name
-    to: Event.EventData.Data[2]
+    to: Event.EventData.Data.#text[2]
   - name: Threat Path
-    to: Event.EventData.Data[1]
+    to: Event.EventData.Data.#text[1]
   - name: SHA1
     container:
-      field: Event.EventData.Data[4]
+      field: Event.EventData.Data.#text[4]
       format: json
     to: sha1FileHash  
 
