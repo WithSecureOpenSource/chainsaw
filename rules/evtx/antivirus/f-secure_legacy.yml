@@ -24,7 +24,7 @@ fields:
   - name: Threat Name
     to: Event.EventData.MessageText
   - name: Threat Path
-    to: Event.EventData.Data
+    to: Event.EventData.Data.#text
 
 filter:
   Event.System.Provider:

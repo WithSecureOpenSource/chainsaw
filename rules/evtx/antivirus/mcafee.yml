@@ -20,7 +20,7 @@ fields:
   - name: Computer
     to: Event.System.Computer
   - name: Threat Name
-    to: Event.EventData.Data
+    to: Event.EventData.Data.#text
 
 filter:
   Event.System.Provider:
