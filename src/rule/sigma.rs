@@ -340,6 +340,42 @@ lazy_static::lazy_static! {
     };
 }
 
+const MAXDASHES: usize = 5;
+const WINDASHES: [char; 5] = ['-', '/', '\u{2013}', '\u{2014}', '\u{2015}'];
+
+fn build_windash_permutations(value: &str) -> Result<Vec<String>> {
+    let chars: Vec<char> = value.chars().collect();
+    let positions: Vec<usize> = chars
+        .iter()
+        .enumerate()
+        .filter(|(_, c)| WINDASHES.contains(c))
+        .map(|(i, _)| i)
+        .collect();
+    if positions.len() > MAXDASHES {
+        return Err(anyhow!(value.to_owned()).context(format!(
+            "windash value has {} dash positions, maximum supported is {}",
+            positions.len(),
+            MAXDASHES
+        )));
+    }
+    let mut variants = vec![chars];
+    for &position in &positions {
+        let mut next = Vec::with_capacity(variants.len() * WINDASHES.len());
+        for variant in &variants {
+            for &dash in &WINDASHES {
+                let mut v = variant.clone();
+                v[position] = dash;
+                next.push(v);
+            }
+        }
+        variants = next;
+    }
+    Ok(variants
+        .into_iter()
+        .map(|v| v.into_iter().collect())
+        .collect())
+}
+
 fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
     let mut unsupported: Vec<String> = modifiers
         .difference(&*SUPPORTED_MODIFIERS)
@@ -348,6 +384,9 @@ fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
     if !unsupported.is_empty() {
         unsupported.sort();
         return Err(anyhow!(unsupported.join(", ")).context("unsupported modifiers"));
+    }
+    if modifiers.contains("windash") && modifiers.contains("all") {
+        return Err(anyhow!("all, windash").context("unsupported modifier combination"));
     }
 
     let v = match value {
@@ -391,6 +430,17 @@ fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
                     let len = value.len();
                     let trimmed = encoded[S[i]..encoded.len() - E[len % 3]].to_owned();
                     scratch.push(parse_identifier(&Yaml::String(trimmed), &remaining)?);
+                }
+                Yaml::Sequence(scratch)
+            } else if modifiers.contains("windash") {
+                let mut modifiers = modifiers.clone();
+                let _ = modifiers.remove("windash");
+                let mut scratch = Vec::with_capacity(5);
+                for variant in build_windash_permutations(s)? {
+                    match parse_identifier(&Yaml::String(variant), &modifiers)? {
+                        Yaml::Sequence(s) => scratch.extend(s),
+                        v => scratch.push(v),
+                    }
                 }
                 Yaml::Sequence(scratch)
             } else if modifiers.contains("contains") {
@@ -445,36 +495,7 @@ fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
                 };
                 Yaml::String(s)
             };
-            if modifiers.contains("windash") {
-                match s {
-                    Yaml::String(s) => Yaml::Sequence(vec![
-                        Yaml::String(s.replace("-", "/")),
-                        Yaml::String(s.replace("-", "–")),
-                        Yaml::String(s.replace("-", "—")),
-                        Yaml::String(s.replace("-", "―")),
-                        Yaml::String(s),
-                    ]),
-                    Yaml::Sequence(v) => {
-                        let mut vec = Vec::with_capacity(v.len() * 5);
-                        for s in v {
-                            match s {
-                                Yaml::String(s) => {
-                                    vec.push(Yaml::String(s.replace("-", "/")));
-                                    vec.push(Yaml::String(s.replace("-", "–")));
-                                    vec.push(Yaml::String(s.replace("-", "—")));
-                                    vec.push(Yaml::String(s.replace("-", "―")));
-                                    vec.push(Yaml::String(s));
-                                }
-                                _ => vec.push(s),
-                            }
-                        }
-                        Yaml::Sequence(vec)
-                    }
-                    _ => s,
-                }
-            } else {
-                s
-            }
+            s
         }
         _ => value.clone(),
     };
@@ -1220,6 +1241,34 @@ mod tests {
         "#;
         let yaml: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
         let yaml = parse_identifier(&yaml, &HashSet::new()).unwrap();
+        assert_eq!(yaml, expected);
+    }
+
+    #[test]
+    fn test_windash_expansion() {
+        let rule = r#"
+            array:
+            - i-a
+            - i/a
+            - i–a
+            - i—a
+            - i―a
+            - i-b
+            - i/b
+            - i–b
+            - i—b
+            - i―b
+        "#;
+        let expected: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+
+        let rule = r#"
+            array:
+            - -a
+            - -b
+        "#;
+        let yaml: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+        let mods = HashSet::from_iter(vec!["windash".to_owned()]);
+        let yaml = parse_identifier(&yaml, &mods).unwrap();
         assert_eq!(yaml, expected);
     }
 
