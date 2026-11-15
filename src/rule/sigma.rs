@@ -247,7 +247,7 @@ impl Match for String {
             }
             if self.ends_with('*') {
                 let mut count = 0;
-                for c in self.chars().rev().skip(1){
+                for c in self.chars().rev().skip(1) {
                     if c == '\\' {
                         count += 1;
                     } else {
@@ -255,8 +255,8 @@ impl Match for String {
                     }
                 }
                 if count % 2 == 0 {
-                end -= 1;
-    }
+                    end -= 1;
+                }
             }
             // NOTE: Nested wildcards are handled in regex as this is the only supported approach
             // via Tau
@@ -280,9 +280,17 @@ impl Match for String {
                         scratch.push('\\');
                         escaped = false;
                     }
-                    '*' | '?' => {
+                    '*' => {
                         if !escaped {
                             scratch.push('.');
+                        }
+                        escaped = false;
+                    }
+                    '?' => {
+                        if !escaped {
+                            scratch.push('.');
+                            escaped = false;
+                            continue;
                         }
                         escaped = false;
                     }
@@ -1082,7 +1090,7 @@ mod tests {
         assert_eq!(x.as_regex(true).unwrap(), "i?foo.*bar");
 
         let x = "foo?bar".to_owned();
-        assert_eq!(x.as_regex(true).unwrap(), "i?foo.?bar");
+        assert_eq!(x.as_regex(true).unwrap(), "i?foo.bar");
 
         let x = r"foo\bar".to_owned();
         assert_eq!(x.as_regex(true).unwrap(), r"i?foo\\bar");
@@ -1097,12 +1105,12 @@ mod tests {
         assert_eq!(x.as_regex(true).unwrap(), r"i?foo\\\\\?bar");
 
         let x = "foo.?bar".to_owned();
-        assert_eq!(x.as_regex(true).unwrap(), "i?foo\\..?bar");
+        assert_eq!(x.as_regex(true).unwrap(), "i?foo\\..bar");
 
         let x = ".+*?()|[]{}^$#&-~".to_owned();
         assert_eq!(
             x.as_regex(true).unwrap(),
-            "i?\\.\\+.*.?\\(\\)\\|\\[\\]\\{\\}\\^\\$\\#\\&\\-\\~"
+            "i?\\.\\+.*.\\(\\)\\|\\[\\]\\{\\}\\^\\$\\#\\&\\-\\~"
         );
 
         let x = r"foobar\".to_owned();

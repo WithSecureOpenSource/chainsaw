@@ -1,7 +1,7 @@
 use std::fs::File;
 use std::path::Path;
 
-use evtx::{err::EvtxError, EvtxParser, ParserSettings, SerializedEvtxRecord};
+use evtx::{EvtxParser, ParserSettings, SerializedEvtxRecord, err::EvtxError};
 use regex::RegexSet;
 use serde_json::Value as Json;
 use tau_engine::{Document, Value as Tau};
