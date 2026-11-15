@@ -20,7 +20,6 @@ chrono-tz = { version = "0.10", features = ["serde"] }
 clap = { version = "4.0", features = ["derive"] }
 crossterm = "0.29"
 evtx = { version = "0.15", default-features = false }
-hex = "0.4.3"
 indicatif = "0.18"
 lazy_static = "1.4.0"
 libesedb = "0.2.4"
