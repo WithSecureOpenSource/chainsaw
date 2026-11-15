@@ -196,6 +196,26 @@ impl Condition for String {
     }
 }
 
+fn unescape(s: &str) -> String {
+    let mut scratch = String::with_capacity(s.len());
+    let mut escaped = false;
+    for c in s.chars() {
+        if c == '\\' && !escaped {
+            escaped = true;
+            continue;
+        }
+        if escaped && !(c == '\\' || c == '*' || c == '?') {
+            scratch.push('\\');
+        }
+        scratch.push(c);
+        escaped = false;
+    }
+    if escaped {
+        scratch.push('\\');
+    }
+    scratch
+}
+
 trait Match {
     fn as_contains(&self) -> Option<String>;
     fn as_endswith(&self) -> Option<String>;
@@ -209,13 +229,13 @@ impl Match for String {
         if self.contains("*") || self.contains('?') {
             return None;
         }
-        Some(format!("i*{}*", self))
+        Some(format!("i*{}*", unescape(self)))
     }
     fn as_endswith(&self) -> Option<String> {
         if self.contains("*") || self.contains('?') {
             return None;
         }
-        Some(format!("i*{}", self))
+        Some(format!("i*{}", unescape(self)))
     }
     fn as_match(&self) -> Option<String> {
         let len = self.len();
@@ -226,7 +246,17 @@ impl Match for String {
                 start += 1;
             }
             if self.ends_with('*') {
+                let mut count = 0;
+                for c in self.chars().rev().skip(1){
+                    if c == '\\' {
+                        count += 1;
+                    } else {
+                        break;
+                    }
+                }
+                if count % 2 == 0 {
                 end -= 1;
+    }
             }
             // NOTE: Nested wildcards are handled in regex as this is the only supported approach
             // via Tau
@@ -234,7 +264,7 @@ impl Match for String {
                 return None;
             }
         }
-        Some(format!("i{}", self))
+        Some(format!("i{}", unescape(self)))
     }
     fn as_regex(&self, convert: bool) -> Option<String> {
         if convert {
@@ -281,7 +311,7 @@ impl Match for String {
         if self.contains("*") || self.contains('?') {
             return None;
         }
-        Some(format!("i{}*", self))
+        Some(format!("i{}*", unescape(self)))
     }
 }
 
@@ -1002,12 +1032,18 @@ mod tests {
     fn test_match_contains() {
         let x = "foobar".to_owned();
         assert_eq!(x.as_contains().unwrap(), "i*foobar*");
+
+        let x = "\\\\foobar".to_owned();
+        assert_eq!(x.as_contains().unwrap(), "i*\\foobar*");
     }
 
     #[test]
     fn test_match_endswith() {
         let x = "foobar".to_owned();
         assert_eq!(x.as_endswith().unwrap(), "i*foobar");
+
+        let x = "\\\\foobar".to_owned();
+        assert_eq!(x.as_endswith().unwrap(), "i*\\foobar");
     }
 
     #[test]
@@ -1023,6 +1059,9 @@ mod tests {
 
         let x = "*foobar*".to_owned();
         assert_eq!(x.as_match().unwrap(), "i*foobar*");
+
+        let x = "*\\\\foobar*".to_owned();
+        assert_eq!(x.as_match().unwrap(), "i*\\foobar*");
 
         // NOTE: These are none as we need to write regex to support them...
         let x = "foo*bar".to_owned();
@@ -1077,6 +1116,9 @@ mod tests {
     fn test_match_startswith() {
         let x = "foobar".to_owned();
         assert_eq!(x.as_startswith().unwrap(), "ifoobar*");
+
+        let x = "\\\\foobar".to_owned();
+        assert_eq!(x.as_startswith().unwrap(), "i\\foobar*");
     }
 
     #[test]
