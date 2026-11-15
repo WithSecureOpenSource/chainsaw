@@ -401,7 +401,13 @@ fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
             } else if modifiers.contains("endswith") {
                 match s.as_endswith() {
                     Some(s) => Yaml::String(s),
-                    None => Yaml::String(s.as_regex(true).expect("unsupported regex")),
+                    None => Yaml::String(format!(
+                        "i?{}$",
+                        s.as_regex(true)
+                            .expect("unsupported regex")
+                            .strip_prefix("i?")
+                            .expect("invalid regex")
+                    )),
                 }
             } else if modifiers.contains("re") {
                 let r = match s.as_regex(false) {
@@ -418,14 +424,20 @@ fn parse_identifier(value: &Yaml, modifiers: &HashSet<String>) -> Result<Yaml> {
             } else if modifiers.contains("startswith") {
                 match s.as_startswith() {
                     Some(s) => Yaml::String(s),
-                    None => Yaml::String(s.as_regex(true).expect("unsupported regex")),
+                    None => Yaml::String(format!(
+                        "i?^{}",
+                        s.as_regex(true)
+                            .expect("unsupported regex")
+                            .strip_prefix("i?")
+                            .expect("invalid regex")
+                    )),
                 }
             } else {
                 let s = match s.as_match() {
                     Some(s) => s,
                     None => {
                         if let Some(r) = s.as_regex(true) {
-                            r
+                            format!("i?^{}$", r.strip_prefix("i?").expect("invalid regex"))
                         } else {
                             return Err(anyhow!(s.to_owned()).context("unsupported match"));
                         }
@@ -1127,6 +1139,57 @@ mod tests {
 
         let x = "\\\\foobar".to_owned();
         assert_eq!(x.as_startswith().unwrap(), "i\\foobar*");
+    }
+
+    #[test]
+    fn test_anchors_regex() {
+        let rule = r#"
+            array:
+            - i?^a.c.*$
+            - i?^.*a.c$
+            - i?^a.c$
+        "#;
+        let expected: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+
+        let rule = r#"
+            array:
+            - 'a?c*'
+            - '*a?c'
+            - a?c
+        "#;
+        let yaml: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+        let yaml = parse_identifier(&yaml, &HashSet::new()).unwrap();
+        assert_eq!(yaml, expected);
+
+        let rule = r#"
+            foo:
+            - i?^a.c
+        "#;
+        let expected: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+
+        let rule = r#"
+            foo:
+            - 'a?c'
+        "#;
+        let yaml: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+        let mods = HashSet::from_iter(vec!["startswith".to_owned()]);
+        let yaml = parse_identifier(&yaml, &mods).unwrap();
+        assert_eq!(yaml, expected);
+
+        let rule = r#"
+            bar:
+            - i?a.c$
+        "#;
+        let expected: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+
+        let rule = r#"
+            bar:
+            - 'a?c'
+        "#;
+        let yaml: serde_yaml::Value = serde_yaml::from_str(rule).unwrap();
+        let mods = HashSet::from_iter(vec!["endswith".to_owned()]);
+        let yaml = parse_identifier(&yaml, &mods).unwrap();
+        assert_eq!(yaml, expected);
     }
 
     #[test]
