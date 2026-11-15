@@ -5,7 +5,7 @@ Event:
   System:
     Provider_attributes:
       Name: Microsoft-Windows-Security-Auditing
-      Guid: 54849625-5478-4994-A5BA-3E3B0328C30D
+      Guid: '{54849625-5478-4994-a5ba-3e3b0328c30d}'
     EventID: 4624
     Version: 2
     Level: 0
@@ -13,10 +13,10 @@ Event:
     Opcode: 0
     Keywords: '0x8020000000000000'
     TimeCreated_attributes:
-      SystemTime: 2022-10-11T19:26:52.154080Z
+      SystemTime: 2022-10-11T19:26:52.1540806Z
     EventRecordID: 31794
     Correlation_attributes:
-      ActivityID: 5965E1C0-DDA7-0003-D8E1-6559A7DDD801
+      ActivityID: '{5965e1c0-dda7-0003-d8e1-6559a7ddd801}'
     Execution_attributes:
       ProcessID: 688
       ThreadID: 736
@@ -36,7 +36,7 @@ Event:
     LogonProcessName: 'Advapi  '
     AuthenticationPackageName: Negotiate
     WorkstationName: '-'
-    LogonGuid: 00000000-0000-0000-0000-000000000000
+    LogonGuid: '{00000000-0000-0000-0000-000000000000}'
     TransmittedServices: '-'
     LmPackageName: '-'
     KeyLength: 0
@@ -59,7 +59,7 @@ Event:
   System:
     Provider_attributes:
       Name: Microsoft-Windows-Security-Auditing
-      Guid: 54849625-5478-4994-A5BA-3E3B0328C30D
+      Guid: '{54849625-5478-4994-a5ba-3e3b0328c30d}'
     EventID: 4624
     Version: 2
     Level: 0
@@ -67,10 +67,10 @@ Event:
     Opcode: 0
     Keywords: '0x8020000000000000'
     TimeCreated_attributes:
-      SystemTime: 2022-10-11T19:26:56.066967Z
+      SystemTime: 2022-10-11T19:26:56.0669673Z
     EventRecordID: 31799
     Correlation_attributes:
-      ActivityID: 5965E1C0-DDA7-0003-D8E1-6559A7DDD801
+      ActivityID: '{5965e1c0-dda7-0003-d8e1-6559a7ddd801}'
     Execution_attributes:
       ProcessID: 688
       ThreadID: 8108
@@ -90,7 +90,7 @@ Event:
     LogonProcessName: 'Advapi  '
     AuthenticationPackageName: Negotiate
     WorkstationName: '-'
-    LogonGuid: 00000000-0000-0000-0000-000000000000
+    LogonGuid: '{00000000-0000-0000-0000-000000000000}'
     TransmittedServices: '-'
     LmPackageName: '-'
     KeyLength: 0
